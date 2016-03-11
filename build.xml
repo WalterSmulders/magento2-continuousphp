@@ -90,4 +90,68 @@
 
     <target name="testall" description="run all tests in one go"
         depends="unit,integration_part_1,integration_part_2,integration_integrity,static_phpcs,static_annotation"/>
+
+    <!-- ****************************** -->
+    <!-- INSTALL TASKS                  -->
+    <!-- ****************************** -->
+    <target name="install-clean-db" description="create clean magento db">
+        <exec executable="mysql">
+            <arg value="-uroot" />
+            <arg value="-e" />
+            <arg value="DROP DATABASE IF EXISTS `magento2`; CREATE DATABASE `magento2` DEFAULT CHARSET utf8;" />
+        </exec>
+    </target>
+
+    <target name="install-magento" description="default install magento" depends="install-clean-db">
+        <exec executable="${project.basedir}/bin/magento" checkreturn="true" passthru="true">
+            <arg value="setup:install" />
+            <arg value="--db-host=127.0.0.1" />
+            <arg value="--db-name=magento2" />
+            <arg value="--db-user=root" />
+            <arg value="--db-password=" />
+            <arg value="--backend-frontname=admin" />
+            <arg value="--base-url=http://magento2.dev" />
+            <arg value="--language=nl_NL" /> <!-- no nl_BE available -->
+            <arg value="--currency=EUR" />
+            <arg value="--timezone=Europe/Brussels" />
+            <arg value="--admin-lastname=test" />
+            <arg value="--admin-firstname=admin" />
+            <arg value="--admin-email=test@example.com" />
+            <arg value="--admin-user=admin" />
+            <arg value="--admin-password=Admin123!" />
+            <arg value="--use-secure=0" />
+            <arg value="--use-rewrites=1" />
+            <arg value="--use-secure-admin=0" />
+            <arg value="--session-save=files" />
+        </exec>
+    </target>
+
+    <!-- ****************************** -->
+    <!-- PACKAGE TASKS                  -->
+    <!-- ****************************** -->
+    <target name="deploy-static-content" description="Deploy the static content for different languages">
+        <exec executable="${project.basedir}/bin/magento" checkreturn="true" passthru="true">
+            <arg value="setup:static-content:deploy" />
+            <arg value="en_US" />
+            <arg value="nl_NL" />
+            <arg value="fr_FR" />
+            <arg value="de_DE" />
+        </exec>
+    </target>
+
+    <target name="package" description="create a deployable tarball">
+        <exec executable="tar" checkreturn="true" passthru="true">
+            <arg value="-zcf" />
+            <arg value="package.tar.gz" />
+            <arg value="setup" />
+            <arg value="app" />
+            <arg value="bin" />
+            <arg value="lib" />
+            <arg value="pub" />
+            <arg value="var" />
+            <arg value="vendor" />
+            <arg value="index.php" />
+            <arg value="composer.json" />
+        </exec>
+    </target>
 </project>
