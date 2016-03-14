@@ -129,6 +129,12 @@
     <!-- ****************************** -->
     <!-- PACKAGE TASKS                  -->
     <!-- ****************************** -->
+    <target name="di-compile" description="build the DI and generated files">
+        <exec executable="${project.basedir}/bin/magento" checkreturn="true" passthru="true">
+            <arg value="setup:di:compile" />
+        </exec>
+    </target>
+
     <target name="deploy-static-content" description="Deploy the static content for different languages">
         <exec executable="${project.basedir}/bin/magento" checkreturn="true" passthru="true">
             <arg value="setup:static-content:deploy" />
